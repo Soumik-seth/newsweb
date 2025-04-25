@@ -6,7 +6,7 @@ import SearchNews from './components/SearchNews';
 
 const App = () => {
   const pageSize = 15;
-  const apikey = process.env.REACT_APP_NEWS_API_KEY || 'f6867a088db2469293980223e8c72944';
+  const apikey = "f6867a088db2469293980223e8c72944";
 
   return (
     <BrowserRouter>
