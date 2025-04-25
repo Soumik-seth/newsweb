@@ -1,0 +1,236 @@
+import logo from './logo.svg';
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { Component } from 'react';
+import Navbar from './components/navbar';
+import News from './components/News';
+
+export default class App extends Component {
+  render() {
+    return (
+      <div>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<News pageSize={6} country="us" category="general" />} />
+            <Route path="/business" element={<News pageSize={6} country="us" category="business" />} />
+            <Route path="/entertainment" element={<News pageSize={6} country="us" category="entertainment" />} />
+            <Route path="/general" element={<News pageSize={6} country="us" category="general" />} />
+            <Route path="/health" element={<News pageSize={6} country="us" category="health" />} />
+            <Route path="/science" element={<News pageSize={6} country="us" category="science" />} />
+            <Route path="/sports" element={<News pageSize={6} country="us" category="sports" />} />
+            <Route path="/technology" element={<News pageSize={6} country="us" category="technology" />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    );
+  }
+}
+import React, { Component } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+export class Navbar extends Component {
+  render() {
+    return (
+      <div>
+        <nav className="navbar navbar-expand-lg bg-body-tertiary">
+          <div className="container-fluid">
+            <a className="navbar-brand" to="/">NewsMonkey</a>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                <li className="nav-item">
+                  <a className="nav-link active" aria-current="page" to="/">Home</a>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/about">about</Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link className="nav-link" to="/ bussiness"> bussiness</Link>
+                </li>
+                
+                <li className="nav-item">
+                  <Link className="nav-link" href="/entertainment"> entertainment</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/general"> general</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/ health">  health</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/science">  science</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/sports">  sports</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/technology">  technology</Link>
+                </li>
+             
+             
+
+
+              </ul>
+              
+            </div>
+          </div>
+        </nav>
+      </div>
+    );
+  }
+}
+
+export default Navbar; // Capitalized export
+import React, { Component } from 'react'
+
+export class NewsItem extends Component {
+  render() {
+    let {title,description,imgurl,newsurl}=this.props;
+    return (
+      <div className='my-3'>
+        <div className="card" style={{width: "18rem"}}>
+  <img src={imgurl} className="card-img-top img-fluid" style={{ height: '170px', objectFit: 'cover' }} alt="..."/>
+  <div className="card-body">
+    <h5 className="card-title">{title}</h5>
+    <p className="card-text">{description}</p>
+    <a href={newsurl}  target='blank' className="btn btn-sm btn-dark">Read more</a>
+  </div>
+</div>
+      </div>
+    )
+  }
+}
+
+export default NewsItem
+import React, { Component } from 'react';
+import NewsItem from './NewsItem';
+import Spinner from './spiner.js';
+import propTypes from 'prop-types';
+export class News extends Component {
+  static defaultProps = {
+  
+    country:'us',
+    pageSize:6,
+    category:"business"
+  };
+  
+  static propTypes = {
+    country: propTypes.string,
+    pageSize: propTypes.number,
+    category: propTypes.string,
+  };
+  
+
+  constructor() {
+    super();
+    this.state = {
+      articles: [
+        {
+          source: { id: "bloomberg", name: "Bloomberg" },
+          author: "Kurt Schussler, Winnie Hsu",
+          title: "Nvidia Supplier Stocks Drop on Latest China Export Restrictions - Bloomberg",
+          description: "Asian technology stocks fell after Nvidia Corp. said the US government will begin requiring a license to export its H20 chips to China, an escalation of restrictions.",
+          url: "https://www.bloomberg.com/news/articles/2025-04-16/nvidia-supplier-stocks-drop-on-latest-china-export-restrictions",
+          urlToImage: "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ik8WYGMMWAt4/v0/1200x800.jpg",
+          publishedAt: "2025-04-16T02:12:00Z",
+          content: "Asian technology stocks fell after Nvidia Corp. said the US government will begin requiring a license to export its H20 chips to China, an escalation of restrictions."
+        }
+      ],
+      loading: false,
+      page:1,
+      totalresult:1
+    };
+  }
+
+  async componentDidMount() {
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=f6867a088db2469293980223e8c72944&pagesize=${this.props.pageSize}`;
+    try {
+      this.setState({loading:true});
+      const data = await fetch(url);
+      const parsedData = await data.json();
+      console.log(parsedData)
+      this.setState({ articles: parsedData.articles || [], loading: false ,totalresult:parsedData.totalResults,loading:false});
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      this.setState({ articles: [], loading: false,
+        
+
+       });
+    }
+  }
+  prevoius=async ()=>{
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=f6867a088db2469293980223e8c72944&page=${this.state.page-1}&pageSize=${this.props.pageSize}`;
+    this.setState({loading:true});
+    const data=await fetch(url);
+    const parsedData = await data.json();
+    this.setState({ articles: parsedData.articles || [], loading: false ,page:this.state.page-1,loading:false});
+    
+  }
+  next=async ()=>{
+    if(this.state.page+1 > Math.ceil(this.state. totalresult/10)){ }else{ 
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=f6867a088db2469293980223e8c72944&page=${this.state.page+1}&pageSize=${this.props.pageSize}`;
+    this.setState({loading:true});
+    const data=await fetch(url);
+    const parsedData = await data.json();
+    this.setState({ articles: parsedData.articles || [], loading: false ,page:this.state.page+1,loading:false});}
+  }
+
+  render() {
+    return (
+      <div className='container my-3'>
+        <h1 className="text-center">NewsMonkey - Top Headlines</h1>
+       { this.state.loading && <Spinner/>}
+        <div className='row'>
+          {this.state.articles.length > 0 ? (
+           !this.state.loading&& this.state.articles.map((element, index) => (
+                <div className='col-md-4' key={index}>
+                  <NewsItem
+                    title={element.title ? element.title.slice(0, 40) : "No Title"}
+                    description={element.description ? element.description.slice(0, 88) : "No Description"}
+                    imgurl={element.urlToImage}
+                    newsurl={element.url}
+                  />
+                </div>
+              ))
+          ) : (
+            <div className="col-12 text-center">
+              {this.state.loading ? <p>Loading...</p> : <p>No news articles found.</p>}
+            </div>
+          )}
+        </div>
+        <div className='container d-flex justify-content-between'>
+        <button disabled={this.state.page<=1} type="button" className="btn btn-dark" onClick={ this.prevoius}> &larr; Previous</button>
+        <button  disabled={this.state.page+1 > Math.ceil(this.state. totalresult/this.props.pageSize)}type="button" className="btn btn-dark" onClick={this.next}>Next &rarr;</button>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default News;
+
+import React, { Component } from 'react';
+import loading from './loading.gif';
+
+export class Spinner extends Component {
+  render() {
+    return (
+      <div className="text-center my-3">
+        <img src={loading} alt="loading" style={{ width: "50px" }} />
+      </div>
+    );
+  }
+}
+
+export default Spinner;
